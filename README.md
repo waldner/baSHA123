@@ -1,4 +1,4 @@
-# baSHA12
+# baSHA123
 
 Low speed SHA1/2/3 message digest in Bash
 
