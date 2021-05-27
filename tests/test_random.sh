@@ -14,9 +14,9 @@ while [ $round -lt $round_max ]; do
   len=$(( ($RANDOM % 5000) + 1 )) 
   echo "len: $len"
 
-  dd if=/dev/urandom status=none bs=1 count=$RANDOM > "$rfile"
+  dd if=/dev/urandom status=none bs=1 count=$len > "$rfile"
 
-  for hash in md5 sha1 sha224 sha256 sha384 sha512 sha512-224 sha512-256; do 
+  for hash in md5 sha1 sha224 sha256 sha384 sha512 sha512-224 sha512-256 sha3-224 sha3-256 sha3-384 sha3-512; do 
     printf "Doing hash: ${hash}..."
     our_value=$(./${hash}.sh < "$rfile")
     openssl_value=$(openssl $hash < "$rfile" | awk '{print $2}')
