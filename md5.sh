@@ -29,12 +29,12 @@ left_rotate(){
     return
   fi
 
-  ensure_nbits $(( (n << s) | (n >> ($nbits - s)) )) "$nbits"
+  ensure_nbits $(( (n << s) | (n >> (nbits - s)) )) "$nbits"
 }
 
 ensure_nbits(){
   local n=$1 nbits=$2
-  MD5_RESULT=$(( $n & (2 ** $nbits - 1) ))
+  MD5_RESULT=$(( n & (2 ** nbits - 1) ))
 }
 
 
@@ -120,7 +120,7 @@ bytes_to_int_lsb(){
 
   for n in "$@"; do
     #result=$(( result + ($n << ($i * 8)) ))
-    ((result+=($n << ($i * 8)) ))
+    ((result+=(n << (i * 8)) ))
     ((i++))
   done
 
@@ -171,7 +171,7 @@ process_chunk(){
     md5_${md5_func} $b $c $d
     result=$MD5_RESULT
 
-    ensure_nbits $(( result + $a + K[round] + x[nword] )) 32
+    ensure_nbits $(( result + a + K[round] + x[nword] )) 32
     result=$MD5_RESULT
     a=$d
     d=$c
@@ -180,21 +180,21 @@ process_chunk(){
     left_rotate $result ${SHIFTS[$round]} 32
 
     result=$MD5_RESULT
-    ensure_nbits $(( b + $result )) 32
+    ensure_nbits $(( b + result )) 32
     b=$MD5_RESULT
 
   done
 
-  ensure_nbits $(( MD5_WORDS[0] + $a )) 32
+  ensure_nbits $(( MD5_WORDS[0] + a )) 32
   MD5_WORDS[0]=$MD5_RESULT
 
-  ensure_nbits $(( MD5_WORDS[1] + $b )) 32
+  ensure_nbits $(( MD5_WORDS[1] + b )) 32
   MD5_WORDS[1]=$MD5_RESULT
 
-  ensure_nbits $(( MD5_WORDS[2] + $c )) 32
+  ensure_nbits $(( MD5_WORDS[2] + c )) 32
   MD5_WORDS[2]=$MD5_RESULT
 
-  ensure_nbits $(( MD5_WORDS[3] + $d )) 32
+  ensure_nbits $(( MD5_WORDS[3] + d )) 32
   MD5_WORDS[3]=$MD5_RESULT
 
 }

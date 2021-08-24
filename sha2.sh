@@ -6,7 +6,7 @@ print_words_hex_32(){
 
   for((i = 0; i < ${#wl[@]}; i++)); do
     printf "%08x " ${wl[i]}
-    if [ $i -ne 0 ] && [ $(( ($i + 1) % 8 )) -eq 0 ]; then
+    if [ $i -ne 0 ] && [ $(( (i + 1) % 8 )) -eq 0 ]; then
       printf '\n'
     fi
   done
@@ -115,7 +115,7 @@ ensure_32bits(){
   local high=$1 low=$2
 
   unset SHA2_RESULT
-  SHA2_RESULT=( $(( $high & 16#ffffffff )) $(( $low & 16#ffffffff )) )
+  SHA2_RESULT=( $(( high & 16#ffffffff )) $(( low & 16#ffffffff )) )
 }
 
 
@@ -255,7 +255,7 @@ int_to_bytes_be(){
 
   if [ $nbytes -eq 16 ]; then
     # cheating
-    SHA2_RESULT=( 0 0 0 0 0 0 0 0 ${SHA2_RESULT[@]} )
+    SHA2_RESULT=( 0 0 0 0 0 0 0 0 "${SHA2_RESULT[@]}" )
   fi
 }
 
@@ -287,28 +287,28 @@ process_chunk(){
     if [ $SHA2_BITS -eq 32 ]; then
 
       right_rotate_32 ${wl[count - 15]} 7
-      p1=( ${SHA2_RESULT[@]} )
+      p1=( "${SHA2_RESULT[@]}" )
 
       right_rotate_32 ${wl[count - 15]} 18
-      p2=( ${SHA2_RESULT[@]} )
+      p2=( "${SHA2_RESULT[@]}" )
 
       right_shift_32 ${wl[count - 15]} 3
-      p3=( ${SHA2_RESULT[@]} )
+      p3=( "${SHA2_RESULT[@]}" )
 
       ensure_32bits 0 $(( p1[1] ^ p2[1] ^ p3[1] ))
-      s0=( ${SHA2_RESULT[@]} )
+      s0=( "${SHA2_RESULT[@]}" )
       
       right_rotate_32 ${wl[count - 2]} 17
-      p1=( ${SHA2_RESULT[@]} )
+      p1=( "${SHA2_RESULT[@]}" )
   
       right_rotate_32 ${wl[count - 2]} 19
-      p2=( ${SHA2_RESULT[@]} )
+      p2=( "${SHA2_RESULT[@]}" )
   
       right_shift_32 ${wl[count - 2]} 10
-      p3=( ${SHA2_RESULT[@]} )
+      p3=( "${SHA2_RESULT[@]}" )
   
       ensure_32bits 0 $(( p1[1] ^ p2[1] ^ p3[1] ))
-      s1=( ${SHA2_RESULT[@]} )
+      s1=( "${SHA2_RESULT[@]}" )
   
       # result from the above: s0 and s1
   
@@ -317,38 +317,38 @@ process_chunk(){
     else
 
       right_rotate_64 ${wh[count - 15]} ${wl[count - 15]} 1
-      p1=( ${SHA2_RESULT[@]} )
+      p1=( "${SHA2_RESULT[@]}" )
 
       right_rotate_64 ${wh[count - 15]} ${wl[count - 15]} 8
-      p2=( ${SHA2_RESULT[@]} )
+      p2=( "${SHA2_RESULT[@]}" )
 
       right_shift_64 ${wh[count - 15]} ${wl[count - 15]} 7
-      p3=( ${SHA2_RESULT[@]} )
+      p3=( "${SHA2_RESULT[@]}" )
 
       ensure_32bits $(( p1[0] ^ p2[0] ^ p3[0] )) $(( p1[1] ^ p2[1] ^ p3[1] ))
-      s0=( ${SHA2_RESULT[@]} )
+      s0=( "${SHA2_RESULT[@]}" )
 
       #printf '%02d: W[t-15] = %08x%08x, s0 = %08x%08x\n' $count ${wh[count-15]} ${wl[count-15]} ${s0[@]}
 
       right_rotate_64 ${wh[count - 2]} ${wl[count - 2]} 19
-      p1=( ${SHA2_RESULT[@]} )
+      p1=( "${SHA2_RESULT[@]}" )
   
       right_rotate_64 ${wh[count - 2]} ${wl[count - 2]} 61
-      p2=( ${SHA2_RESULT[@]} )
+      p2=( "${SHA2_RESULT[@]}" )
   
       right_shift_64 ${wh[count - 2]} ${wl[count - 2]} 6
-      p3=( ${SHA2_RESULT[@]} )
+      p3=( "${SHA2_RESULT[@]}" )
   
       ensure_32bits $(( p1[0] ^ p2[0] ^ p3[0] )) $(( p1[1] ^ p2[1] ^ p3[1] ))
-      s1=( ${SHA2_RESULT[@]} )
+      s1=( "${SHA2_RESULT[@]}" )
   
       # result from the above: s0 and s1
  
       sum_64bits ${wh[count - 16]} ${wl[count - 16]} ${s0[0]} ${s0[1]}
-      p1=( ${SHA2_RESULT[@]} )
+      p1=( "${SHA2_RESULT[@]}" )
 
       sum_64bits ${p1[0]} ${p1[1]} ${wh[count - 7]} ${wl[count - 7]}
-      p1=( ${SHA2_RESULT[@]} )
+      p1=( "${SHA2_RESULT[@]}" )
 
       #printf "%02d: W[t-2] = %08x%08x, W[t-7] = %08x%08x, W[t-15] = %08x%08x, W[t-16] = %08x%08x\n" $count ${wh[count-2]} ${wl[count-2]} ${wh[count-7]} ${wl[count-7]} ${wh[count-15]} ${wl[count-15]} ${wh[count-16]} ${wl[count-16]} 
       #printf "%02d: s1(W[t-2]) = %08x%08x, s0(W[t-15]) = %08x%08x\n" $count ${s1[@]} ${s0[@]} 
@@ -375,121 +375,121 @@ process_chunk(){
     if [ $SHA2_BITS -eq 32 ]; then
 
       right_rotate_32 ${e[1]} 6
-      p1=( ${SHA2_RESULT[@]} )
+      p1=( "${SHA2_RESULT[@]}" )
   
       right_rotate_32 ${e[1]} 11
-      p2=( ${SHA2_RESULT[@]} )
+      p2=( "${SHA2_RESULT[@]}" )
   
       right_rotate_32 ${e[1]} 25
-      p3=( ${SHA2_RESULT[@]} )
+      p3=( "${SHA2_RESULT[@]}" )
   
       ensure_32bits 0 $(( p1[1] ^ p2[1] ^ p3[1] ))
-      s1=( ${SHA2_RESULT[@]} )
+      s1=( "${SHA2_RESULT[@]}" )
   
       ensure_32bits 0 $(( ( e[1] & f[1] ) ^ (~e[1] & g[1]) ))
-      ch=( ${SHA2_RESULT[@]} )
+      ch=( "${SHA2_RESULT[@]}" )
   
       ensure_32bits 0 $(( h[1] + s1[1] + ch[1] + KL[round] + wl[round] ))
-      temp1=( ${SHA2_RESULT[@]} )
+      temp1=( "${SHA2_RESULT[@]}" )
   
       right_rotate_32 ${a[1]} 2
-      p1=( ${SHA2_RESULT[@]} )
+      p1=( "${SHA2_RESULT[@]}" )
   
       right_rotate_32 ${a[1]} 13
-      p2=( ${SHA2_RESULT[@]} )
+      p2=( "${SHA2_RESULT[@]}" )
   
       right_rotate_32 ${a[1]} 22
-      p3=( ${SHA2_RESULT[@]} )
+      p3=( "${SHA2_RESULT[@]}" )
   
       ensure_32bits 0 $(( p1[1] ^ p2[1] ^ p3[1] ))
-      s0=( ${SHA2_RESULT[@]} )
+      s0=( "${SHA2_RESULT[@]}" )
   
       ensure_32bits 0 $(( (a[1] & b[1]) ^ (a[1] & c[1]) ^ (b[1] & c[1]) ))
-      maj=( ${SHA2_RESULT[@]} )
+      maj=( "${SHA2_RESULT[@]}" )
   
       ensure_32bits 0 $(( s0[1] + maj[1] ))
-      temp2=( ${SHA2_RESULT[@]} )
+      temp2=( "${SHA2_RESULT[@]}" )
    
-      h=( ${g[@]} )
-      g=( ${f[@]} )
-      f=( ${e[@]} )
+      h=( "${g[@]}" )
+      g=( "${f[@]}" )
+      f=( "${e[@]}" )
       ensure_32bits 0 $(( d[1] + temp1[1] ))
-      e=( ${SHA2_RESULT[@]} )
-      d=( ${c[@]} )
-      c=( ${b[@]} )
-      b=( ${a[@]} )
+      e=( "${SHA2_RESULT[@]}" )
+      d=( "${c[@]}" )
+      c=( "${b[@]}" )
+      b=( "${a[@]}" )
       ensure_32bits 0 $(( temp1[1] + temp2[1] ))
-      a=( ${SHA2_RESULT[@]} )
+      a=( "${SHA2_RESULT[@]}" )
 
     else
-      right_rotate_64 ${e[@]} 14
-      p1=( ${SHA2_RESULT[@]} )
+      right_rotate_64 "${e[@]}" 14
+      p1=( "${SHA2_RESULT[@]}" )
   
-      right_rotate_64 ${e[@]} 18
-      p2=( ${SHA2_RESULT[@]} )
+      right_rotate_64 "${e[@]}" 18
+      p2=( "${SHA2_RESULT[@]}" )
   
-      right_rotate_64 ${e[@]} 41
-      p3=( ${SHA2_RESULT[@]} )
+      right_rotate_64 "${e[@]}" 41
+      p3=( "${SHA2_RESULT[@]}" )
 
       ensure_32bits $(( p1[0] ^ p2[0] ^ p3[0] )) $(( p1[1] ^ p2[1] ^ p3[1] ))
-      s1=( ${SHA2_RESULT[@]} )
+      s1=( "${SHA2_RESULT[@]}" )
  
       #printf '%02d (s1): %08x%08x\n' $round "${s1[@]}"
  
       ensure_32bits $(( ( e[0] & f[0] ) ^ (~e[0] & g[0]) ))  $(( ( e[1] & f[1] ) ^ (~e[1] & g[1]) ))
-      ch=( ${SHA2_RESULT[@]} )
+      ch=( "${SHA2_RESULT[@]}" )
 
       #printf '%02d (ch): %08x%08x\n' $round "${ch[@]}"
 
       sum_64bits ${h[0]} ${h[1]} ${s1[0]} ${s1[1]}
-      p1=( ${SHA2_RESULT[@]} )
+      p1=( "${SHA2_RESULT[@]}" )
 
       sum_64bits ${p1[0]} ${p1[1]} ${ch[0]} ${ch[1]}
-      p1=( ${SHA2_RESULT[@]} )
+      p1=( "${SHA2_RESULT[@]}" )
 
       #printf '%02d (K[t]): %08x%08x\n' $round "${KH[round]}" "${KL[round]}"
 
       sum_64bits ${p1[0]} ${p1[1]} ${KH[round]} ${KL[round]}
-      p1=( ${SHA2_RESULT[@]} )
+      p1=( "${SHA2_RESULT[@]}" )
 
       #printf '%02d (W[t]): %08x%08x\n' $round "${wh[round]}" "${wl[round]}"
 
       sum_64bits ${p1[0]} ${p1[1]} ${wh[round]} ${wl[round]}
-      temp1=( ${SHA2_RESULT[@]} )
+      temp1=( "${SHA2_RESULT[@]}" )
   
-      right_rotate_64 ${a[@]} 28
-      p1=( ${SHA2_RESULT[@]} )
+      right_rotate_64 "${a[@]}" 28
+      p1=( "${SHA2_RESULT[@]}" )
   
-      right_rotate_64 ${a[@]} 34
-      p2=( ${SHA2_RESULT[@]} )
+      right_rotate_64 "${a[@]}" 34
+      p2=( "${SHA2_RESULT[@]}" )
   
-      right_rotate_64 ${a[@]} 39
-      p3=( ${SHA2_RESULT[@]} )
+      right_rotate_64 "${a[@]}" 39
+      p3=( "${SHA2_RESULT[@]}" )
    
       ensure_32bits $(( p1[0] ^ p2[0] ^ p3[0] )) $(( p1[1] ^ p2[1] ^ p3[1] ))
-      s0=( ${SHA2_RESULT[@]} )
+      s0=( "${SHA2_RESULT[@]}" )
 
       ensure_32bits $(( (a[0] & b[0]) ^ (a[0] & c[0]) ^ (b[0] & c[0]) ))  $(( (a[1] & b[1]) ^ (a[1] & c[1]) ^ (b[1] & c[1]) ))
-      maj=( ${SHA2_RESULT[@]} )
+      maj=( "${SHA2_RESULT[@]}" )
  
       sum_64bits ${s0[0]} ${s0[1]} ${maj[0]} ${maj[1]}
-      temp2=( ${SHA2_RESULT[@]} )
+      temp2=( "${SHA2_RESULT[@]}" )
    
-      h=( ${g[@]} )
-      g=( ${f[@]} )
-      f=( ${e[@]} )
+      h=( "${g[@]}" )
+      g=( "${f[@]}" )
+      f=( "${e[@]}" )
 
       sum_64bits ${d[0]} ${d[1]} ${temp1[0]} ${temp1[1]}
-      e=( ${SHA2_RESULT[@]} )
+      e=( "${SHA2_RESULT[@]}" )
 
-      d=( ${c[@]} )
-      c=( ${b[@]} )
-      b=( ${a[@]} )
+      d=( "${c[@]}" )
+      c=( "${b[@]}" )
+      b=( "${a[@]}" )
 
       #printf '%02d: %08x%08x %08x%08x\n' $round "${temp1[@]}" "${temp2[@]}"
 
       sum_64bits ${temp1[0]} ${temp1[1]} ${temp2[0]} ${temp2[1]}
-      a=( ${SHA2_RESULT[@]} )
+      a=( "${SHA2_RESULT[@]}" )
 
     fi
 
@@ -503,28 +503,28 @@ process_chunk(){
   done
 
   if [ $SHA2_BITS -eq 32 ]; then
-    ensure_32bits 0 $(( SHA2_LWORDS[0] + ${a[1]} ))
+    ensure_32bits 0 $(( SHA2_LWORDS[0] + a[1] ))
     SHA2_LWORDS[0]=${SHA2_RESULT[1]}
   
-    ensure_32bits 0 $(( SHA2_LWORDS[1] + ${b[1]} ))
+    ensure_32bits 0 $(( SHA2_LWORDS[1] + b[1] ))
     SHA2_LWORDS[1]=${SHA2_RESULT[1]}
     
-    ensure_32bits 0 $(( SHA2_LWORDS[2] + ${c[1]} ))
+    ensure_32bits 0 $(( SHA2_LWORDS[2] + c[1] ))
     SHA2_LWORDS[2]=${SHA2_RESULT[1]}
     
-    ensure_32bits 0 $(( SHA2_LWORDS[3] + ${d[1]} ))
+    ensure_32bits 0 $(( SHA2_LWORDS[3] + d[1] ))
     SHA2_LWORDS[3]=${SHA2_RESULT[1]}
     
-    ensure_32bits 0 $(( SHA2_LWORDS[4] + ${e[1]} ))
+    ensure_32bits 0 $(( SHA2_LWORDS[4] + e[1] ))
     SHA2_LWORDS[4]=${SHA2_RESULT[1]}
     
-    ensure_32bits 0 $(( SHA2_LWORDS[5] + ${f[1]} ))
+    ensure_32bits 0 $(( SHA2_LWORDS[5] + f[1] ))
     SHA2_LWORDS[5]=${SHA2_RESULT[1]}
     
-    ensure_32bits 0 $(( SHA2_LWORDS[6] + ${g[1]} ))
+    ensure_32bits 0 $(( SHA2_LWORDS[6] + g[1] ))
     SHA2_LWORDS[6]=${SHA2_RESULT[1]}
     
-    ensure_32bits 0 $(( SHA2_LWORDS[7] + ${h[1]} ))
+    ensure_32bits 0 $(( SHA2_LWORDS[7] + h[1] ))
     SHA2_LWORDS[7]=${SHA2_RESULT[1]}
   else
     sum_64bits ${SHA2_HWORDS[0]} ${SHA2_LWORDS[0]} ${a[0]} ${a[1]}
@@ -748,7 +748,7 @@ while true; do
     declare -a length_bytes    # 8/16-byte array
 
     int_to_bytes_be $msg_len $length_len
-    length_bytes=( ${SHA2_RESULT[@]} )
+    length_bytes=( "${SHA2_RESULT[@]}" )
 
     #declare -p length_bytes
     #declare -p SHA2_RESULT
@@ -784,7 +784,7 @@ while true; do
   fi
 done
 
-result=
+output=
 
 upper=8
 if [ "$name" = "sha224.sh" ]; then
@@ -799,18 +799,18 @@ declare -a temp
 for ((i=0; i < upper; i++)); do
   if [ $SHA2_BITS -eq 64 ]; then
     int_to_bytes_be ${SHA2_HWORDS[i]} 4
-    temp=( ${SHA2_RESULT[@]} )
+    temp=( "${SHA2_RESULT[@]}" )
     printf -v t '%02x' "${temp[@]}"
-    printf -v result '%s%s' "${result}" "${t}"
+    printf -v output '%s%s' "${output}" "${t}"
   fi
   # stupid condition for sha512-224 only
   if [ "$name" != "sha512-224.sh" ] || [ $i -lt $(( upper - 1 )) ]; then
     int_to_bytes_be ${SHA2_LWORDS[i]} 4
-    temp=( ${SHA2_RESULT[@]} )
+    temp=( "${SHA2_RESULT[@]}" )
     printf -v t '%02x' "${temp[@]}"
-    printf -v result '%s%s' "${result}" "${t}"
+    printf -v output '%s%s' "${output}" "${t}"
   fi
 done
 
-echo "$result"
+echo "$output"
 

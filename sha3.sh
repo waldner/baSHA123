@@ -172,7 +172,7 @@ keccak_f_1600(){
 
       local -n D=D_${x}
 
-      D=( ${V1[@]} )
+      D=( "${V1[@]}" )
 
       xor64 D V2
     done
@@ -414,7 +414,7 @@ while true; do
       CHUNK[$BYTES_READ]=0
       ((BYTES_READ++))
     done
-    CHUNK[$BYTES_READ-1]=$((CHUNK[$BYTES_READ-1] ^ 128)) 
+    CHUNK[$BYTES_READ-1]=$((CHUNK[BYTES_READ-1] ^ 128)) 
     
   fi
 

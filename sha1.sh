@@ -23,12 +23,12 @@ sha1_I(){
 # rotates left with wraparound
 left_rotate(){
   local n=$1 s=$2 nbits=$3
-  ensure_nbits $(( (n << s) | (n >> ($nbits - s)) )) "$nbits"
+  ensure_nbits $(( (n << s) | (n >> (nbits - s)) )) "$nbits"
 }
 
 ensure_nbits(){
   local n=$1 nbits=$2
-  SHA1_RESULT=$(( $n & (2 ** $nbits - 1) ))
+  SHA1_RESULT=$(( n & (2 ** nbits - 1) ))
 }
 
 
@@ -100,7 +100,7 @@ bytes_to_int_msb(){
 
   for (( a=$#; a > 0; a-- )); do
     n=${!a}
-    ((result+=($n << ($i * 8) ) ))
+    ((result+=(n << (i * 8) ) ))
     ((i++))
   done
 
@@ -123,6 +123,7 @@ int_to_bytes_be(){
 process_chunk(){
 
   local -a x
+  local temp
 
   for ((count=0; count < 16; count++)); do
     bytes_to_int_msb "${CHUNK[@]:$count*4:4}"
@@ -173,19 +174,19 @@ process_chunk(){
 
   done
 
-  ensure_nbits $(( SHA1_WORDS[0] + $a )) 32
+  ensure_nbits $(( SHA1_WORDS[0] + a )) 32
   SHA1_WORDS[0]=$SHA1_RESULT
 
-  ensure_nbits $(( SHA1_WORDS[1] + $b )) 32
+  ensure_nbits $(( SHA1_WORDS[1] + b )) 32
   SHA1_WORDS[1]=$SHA1_RESULT
 
-  ensure_nbits $(( SHA1_WORDS[2] + $c )) 32
+  ensure_nbits $(( SHA1_WORDS[2] + c )) 32
   SHA1_WORDS[2]=$SHA1_RESULT
 
-  ensure_nbits $(( SHA1_WORDS[3] + $d )) 32
+  ensure_nbits $(( SHA1_WORDS[3] + d )) 32
   SHA1_WORDS[3]=$SHA1_RESULT
 
-  ensure_nbits $(( SHA1_WORDS[4] + $e )) 32
+  ensure_nbits $(( SHA1_WORDS[4] + e )) 32
   SHA1_WORDS[4]=$SHA1_RESULT
 }
 
