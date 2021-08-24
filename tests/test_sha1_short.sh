@@ -1,5 +1,5 @@
 GOT=$(printf '00' | xxd -p -r | ./sha1.sh)
-MD="da39a3ee5e6b4b0d3255bfef95601890afd80709"
+MD="5ba93c9db0cff93f52b521d7420e43f6eda2784f"
 if [ "$GOT" = "$MD" ]; then echo "Success"; else echo "Failure"; fi
 GOT=$(printf '36' | xxd -p -r | ./sha1.sh)
 MD="c1dfd96eea8cc2b62785275bca38ac261256e278"
