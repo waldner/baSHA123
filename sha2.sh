@@ -16,9 +16,6 @@ print_words_hex_64(){
 
   for((i = 0; i < ${#wh[@]}; i++)); do
     printf "%02d: %08x%08x\n" $i ${wh[i]} ${wl[i]}
-    #if [ $i -ne 0 ] && [ $(( $i % 8 )) -eq 0 ]; then
-    #  printf '\n'
-    #fi
   done
 
 }
@@ -71,8 +68,6 @@ right_rotate_64(){
 
   local nh=$1 nl=$2 s=$3
 
-  #printf 'Before %02d rotation: %08x%08x\n' $s $nh $nl
-
   local new_nh new_nl
 
   if [ $s -lt 32 ]; then
@@ -84,7 +79,6 @@ right_rotate_64(){
   fi
   ensure_32bits $new_nh $new_nl
 
-  #printf 'After  %02d rotation: %08x%08x\n' $s ${SHA2_RESULT[@]}
 }
 
 # plain shift right, no wraparound
@@ -328,8 +322,6 @@ process_chunk(){
       ensure_32bits $(( p1[0] ^ p2[0] ^ p3[0] )) $(( p1[1] ^ p2[1] ^ p3[1] ))
       s0=( "${SHA2_RESULT[@]}" )
 
-      #printf '%02d: W[t-15] = %08x%08x, s0 = %08x%08x\n' $count ${wh[count-15]} ${wl[count-15]} ${s0[@]}
-
       right_rotate_64 ${wh[count - 2]} ${wl[count - 2]} 19
       p1=( "${SHA2_RESULT[@]}" )
   
@@ -349,9 +341,6 @@ process_chunk(){
 
       sum_64bits ${p1[0]} ${p1[1]} ${wh[count - 7]} ${wl[count - 7]}
       p1=( "${SHA2_RESULT[@]}" )
-
-      #printf "%02d: W[t-2] = %08x%08x, W[t-7] = %08x%08x, W[t-15] = %08x%08x, W[t-16] = %08x%08x\n" $count ${wh[count-2]} ${wl[count-2]} ${wh[count-7]} ${wl[count-7]} ${wh[count-15]} ${wl[count-15]} ${wh[count-16]} ${wl[count-16]} 
-      #printf "%02d: s1(W[t-2]) = %08x%08x, s0(W[t-15]) = %08x%08x\n" $count ${s1[@]} ${s0[@]} 
 
       sum_64bits ${p1[0]} ${p1[1]} ${s1[0]} ${s1[1]}
       wh[count]=${SHA2_RESULT[0]}
@@ -434,12 +423,8 @@ process_chunk(){
       ensure_32bits $(( p1[0] ^ p2[0] ^ p3[0] )) $(( p1[1] ^ p2[1] ^ p3[1] ))
       s1=( "${SHA2_RESULT[@]}" )
  
-      #printf '%02d (s1): %08x%08x\n' $round "${s1[@]}"
- 
       ensure_32bits $(( ( e[0] & f[0] ) ^ (~e[0] & g[0]) ))  $(( ( e[1] & f[1] ) ^ (~e[1] & g[1]) ))
       ch=( "${SHA2_RESULT[@]}" )
-
-      #printf '%02d (ch): %08x%08x\n' $round "${ch[@]}"
 
       sum_64bits ${h[0]} ${h[1]} ${s1[0]} ${s1[1]}
       p1=( "${SHA2_RESULT[@]}" )
@@ -447,12 +432,8 @@ process_chunk(){
       sum_64bits ${p1[0]} ${p1[1]} ${ch[0]} ${ch[1]}
       p1=( "${SHA2_RESULT[@]}" )
 
-      #printf '%02d (K[t]): %08x%08x\n' $round "${KH[round]}" "${KL[round]}"
-
       sum_64bits ${p1[0]} ${p1[1]} ${KH[round]} ${KL[round]}
       p1=( "${SHA2_RESULT[@]}" )
-
-      #printf '%02d (W[t]): %08x%08x\n' $round "${wh[round]}" "${wl[round]}"
 
       sum_64bits ${p1[0]} ${p1[1]} ${wh[round]} ${wl[round]}
       temp1=( "${SHA2_RESULT[@]}" )
@@ -486,20 +467,11 @@ process_chunk(){
       c=( "${b[@]}" )
       b=( "${a[@]}" )
 
-      #printf '%02d: %08x%08x %08x%08x\n' $round "${temp1[@]}" "${temp2[@]}"
-
       sum_64bits ${temp1[0]} ${temp1[1]} ${temp2[0]} ${temp2[1]}
       a=( "${SHA2_RESULT[@]}" )
 
     fi
 
-    #printf "$round: " 
-    #if [ $SHA2_BITS -eq 32 ]; then
-    #  print_letters_hex_${SHA2_BITS} ${a[1]} ${b[1]} ${c[1]} ${d[1]} ${e[1]} ${f[1]} ${g[1]} ${h[1]}
-    #else
-    #  print_letters_hex_${SHA2_BITS} ${a[@]} ${b[@]} ${c[@]} ${d[@]} ${e[@]} ${f[@]} ${g[@]} ${h[@]} 
-    #fi
- 
   done
 
   if [ $SHA2_BITS -eq 32 ]; then
@@ -713,8 +685,6 @@ while true; do
   if [ $BYTES_READ -lt $SHA2_CHUNK ]; then
     # EOF, add padding
 
-    #echo "final loop"
-
     length_len=$((SHA2_BITS / 4))   # 32 bit: 8 bytes, 64 bit: 16 bytes
     multiple=$SHA2_CHUNK            # final message must be multiple of 64/128 bytes
 
@@ -727,8 +697,6 @@ while true; do
 
     # how many bytes of 0 padding (without length)
     padding_len=$(( length_with_padding - length_len - tot_bytes ))
-
-    #echo "tot_bytes: $tot_bytes, length with padding: $length_with_padding, padding_len: $padding_len, length len: $length_len"
 
     declare -a padding
 
@@ -749,10 +717,6 @@ while true; do
 
     int_to_bytes_be $msg_len $length_len
     length_bytes=( "${SHA2_RESULT[@]}" )
-
-    #declare -p length_bytes
-    #declare -p SHA2_RESULT
-    #exit
 
     for ((i = 0; i < ${#length_bytes[@]}; i++)); do
       padding[padding_len + i]=${length_bytes[i]}
