@@ -538,7 +538,7 @@ process_chunk(){
 
 export LC_ALL=C
 
-name=$(basename "$0")
+name="${0##*/}"
 
 if [[ ! "$name" =~ ^sha(224|256|384|512(-(224|256))?)\.sh$ ]]; then
   echo "Cannot use $name to call this script" >&2
